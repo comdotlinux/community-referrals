@@ -17,8 +17,18 @@ jobs:
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
-    - name: Build
-      run: ./gradlew build
+    - name: 'Gradle Cache'
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          ${{ github.workspace }}/backend/build-cache
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: ${{ runner.os }}-gradle-
+
+    - name: 'Build (skipping tests for now)'
+      run: ./gradlew build -x test
 
     - name: Build and Push
       run: heroku container:push web --app nokri-nokri
