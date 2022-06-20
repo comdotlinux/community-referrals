@@ -14,7 +14,7 @@ rootProject.name="nokri"
 
 
 plugins {
-    id("com.gradle.enterprise") version("3.10.1") // https://plugins.gradle.org/plugin/com.gradle.enterprise
+    id("com.gradle.enterprise") version("3.10.2") // https://plugins.gradle.org/plugin/com.gradle.enterprise
 }
 
 gradleEnterprise {
