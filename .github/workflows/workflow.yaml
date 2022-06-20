@@ -16,11 +16,21 @@ jobs:
       run: heroku container:login
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+    - name: Build
+      run: ./gradlew build
+
     - name: Build and Push
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       run: heroku container:push web --app nokri-nokri
-    - name: Release
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+    - name: Release
       run: heroku container:release web --app nokri-nokri
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+    - name: Deployment Logs
+      run: heroku logs --app nokri-nokri --num 500
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
