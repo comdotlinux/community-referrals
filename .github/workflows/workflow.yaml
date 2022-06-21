@@ -35,6 +35,8 @@ jobs:
 
     - name: 'gradle: Build (skipping tests for now) push and release to heroku'
       run: ./gradlew herokuDeploy -x test
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
     - name: Deployment Logs
       run: heroku logs --app nokri-nokri --num 500
