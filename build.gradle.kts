@@ -45,3 +45,55 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     kotlinOptions.javaParameters = true
 }
+
+// TODO: De-duplicate following tasks with a single configurable task
+
+task("herokuLogin") {
+    group = "nokri"
+    description="Login to heroku"
+    doLast {
+        exec {
+            executable="heroku"
+            args="container:login".split(" ")
+            environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
+        }
+    }
+}
+
+task("herokuPushImage") {
+    group = "nokri"
+    description="Push Created docker Image to Heroku"
+    dependsOn("herokuLogin", tasks.findByName("build"))
+    doLast {
+        exec {
+            executable="docker"
+            args="push registry.heroku.com/nokri-nokri/web".split(" ")
+            environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
+        }
+    }
+}
+
+task("herokuDeploy") {
+    group = "nokri"
+    description="Trigger Deployment to heroku"
+    dependsOn("herokuPushImage")
+    doLast {
+        exec {
+            executable="heroku"
+            args="container:release web --app nokri-nokri".split(" ")
+            environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
+        }
+    }
+}
+
+task("herokuShowLogs") {
+    group = "nokri"
+    description="Show logs from heroku container"
+    doLast {
+        exec {
+            executable="heroku"
+            args="logs --app nokri-nokri --num 500 --force-colors".split(" ")
+            environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
+        }
+    }
+}

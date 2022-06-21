@@ -5,19 +5,25 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     environment: dev
     steps:
     - name: Checkout Code
       uses: actions/checkout@v1
 
-    - name: Login to Heroku Container registry
-      run: heroku container:login
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+    - name: 'asdf: Setup'
+      uses: asdf-vm/actions/setup@v1.1.0
+      with:
+        asdf_branch: v0.9.0
 
-    - name: 'Gradle Cache'
+    - name: 'asdf: plugin install / update'
+      shell: bash
+      run: asdf plugin update --all
+
+    - name: 'asdf: install'
+      uses: asdf-vm/actions/install@v1
+
+    - name: 'gradle: cache'
       uses: actions/cache@v3
       with:
         path: |
@@ -27,18 +33,8 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: ${{ runner.os }}-gradle-
 
-    - name: 'Build (skipping tests for now)'
-      run: ./gradlew build -x test
-
-    - name: Build and Push
-      run: heroku container:push web --app nokri-nokri
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-
-    - name: Release
-      run: heroku container:release web --app nokri-nokri
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+    - name: 'gradle: Build (skipping tests for now) push and release to heroku'
+      run: ./gradlew herokuDeploy -x test
 
     - name: Deployment Logs
       run: heroku logs --app nokri-nokri --num 500
