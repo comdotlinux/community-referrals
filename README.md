@@ -1,4 +1,4 @@
-# nokri
+# Community-Referrals
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 

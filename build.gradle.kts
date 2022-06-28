@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.allopen") version "1.6.21"
     id("io.quarkus")
+    id("com.vaadin")
 }
 
 repositories {
@@ -12,17 +13,27 @@ repositories {
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
+val vaadinVersion: String by project
+val vaadinQuarkusVersion: String by project
 
 dependencies {
-    implementation("io.quarkus:quarkus-container-image-docker")
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    implementation("io.quarkus:quarkus-resteasy-reactive-qute")
-    implementation("io.quarkus:quarkus-rest-client-reactive-kotlin-serialization")
+
+    implementation(enforcedPlatform("com.vaadin:vaadin-bom:$vaadinVersion"))
+
+    // Vaadin
+    implementation("com.vaadin:vaadin-core")
+    implementation("com.vaadin:vaadin-core-jandex")
+    implementation("com.vaadin:vaadin-quarkus:$vaadinQuarkusVersion")
+
+    implementation("io.quarkus:quarkus-websockets")
+    implementation("io.quarkus:quarkus-container-image-docker")
     implementation("io.quarkus:quarkus-kotlin")
-    implementation("io.quarkus:quarkus-redis-client")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-resteasy-reactive")
+    implementation("io.quarkus:quarkus-oidc")
+    implementation("io.quarkus:quarkus-jdbc-postgresql")
+    implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }
@@ -33,6 +44,13 @@ version = "1.0.0-SNAPSHOT"
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.quarkusDev {
+    compilerOptions {
+        compiler("kotlin")
+//            .args(mutableListOf("-Werror"))
+    }
 }
 
 allOpen {
@@ -49,7 +67,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 // TODO: De-duplicate following tasks with a single configurable task
 
 task("herokuLogin") {
-    group = "nokri"
+    group = "referrals"
     description="Login to heroku"
     doLast {
         exec {
@@ -61,38 +79,38 @@ task("herokuLogin") {
 }
 
 task("herokuPushImage") {
-    group = "nokri"
+    group = "referrals"
     description="Push Created docker Image to Heroku"
     dependsOn("herokuLogin", tasks.findByName("build"))
     doLast {
         exec {
             executable="docker"
-            args="push registry.heroku.com/nokri-nokri/web".split(" ")
+            args="push registry.heroku.com/community-referrals/web".split(" ")
             environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
         }
     }
 }
 
 task("herokuDeploy") {
-    group = "nokri"
+    group = "referrals"
     description="Trigger Deployment to heroku"
     dependsOn("herokuPushImage")
     doLast {
         exec {
             executable="heroku"
-            args="container:release web --app nokri-nokri".split(" ")
+            args="container:release web --app community-referrals".split(" ")
             environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
         }
     }
 }
 
 task("herokuShowLogs") {
-    group = "nokri"
+    group = "referrals"
     description="Show logs from heroku container"
     doLast {
         exec {
             executable="heroku"
-            args="logs --app nokri-nokri --num 500 --force-colors".split(" ")
+            args="logs --app community-referrals --num 500 --force-colors".split(" ")
             environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
         }
     }

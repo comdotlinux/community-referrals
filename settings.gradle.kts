@@ -1,16 +1,19 @@
 pluginManagement {
     val quarkusPluginVersion: String by settings
     val quarkusPluginId: String by settings
+    val vaadinVersion: String by settings
     repositories {
         mavenCentral()
         gradlePluginPortal()
         mavenLocal()
+        maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
     }
     plugins {
         id(quarkusPluginId) version quarkusPluginVersion
+        id("com.vaadin") version vaadinVersion
     }
 }
-rootProject.name="nokri"
+rootProject.name="community-referrals"
 
 
 plugins {
