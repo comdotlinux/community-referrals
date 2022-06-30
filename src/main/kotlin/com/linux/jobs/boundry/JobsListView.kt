@@ -2,7 +2,6 @@ package com.linux.jobs.boundry
 
 import com.linux.jobs.control.JobForm
 import com.linux.jobs.entity.Job
-import com.vaadin.flow.component.avatar.Avatar
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.grid.Grid
@@ -11,10 +10,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.page.AppShellConfigurator
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.value.ValueChangeMode
+import com.vaadin.flow.router.BeforeEnterEvent
+import com.vaadin.flow.router.BeforeEnterObserver
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.PWA
 import com.vaadin.flow.theme.Theme
+import io.quarkus.security.identity.SecurityIdentity
+import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.eclipse.microprofile.jwt.JsonWebToken
 import javax.websocket.Endpoint
 import javax.websocket.server.ServerApplicationConfig
 import javax.websocket.server.ServerEndpointConfig
@@ -28,9 +32,9 @@ class AppConfig : AppShellConfigurator, ServerApplicationConfig {
 }
 
 @Suppress("unused")
-@Route(value = "")
+@Route(value = "/referral")
 @PageTitle("Jobs")
-class JobsListView : VerticalLayout() {
+class JobsListView(private val securityIdentity: SecurityIdentity, @ConfigProperty(name = "quarkus.oidc.auth-server-url") val authUrl: String) : VerticalLayout(), BeforeEnterObserver {
     init {
         addClassName("jobs-list")
         setSizeFull()
@@ -67,5 +71,10 @@ class JobsListView : VerticalLayout() {
         addClassName("toolbar")
     }
 
+    override fun beforeEnter(event: BeforeEnterEvent) {
+        if(securityIdentity.isAnonymous || !securityIdentity.hasRole("user")) {
+            event.rerouteTo("https://auth.kulkarni.cloud/realms/referrals")
+        }
+    }
 
 }

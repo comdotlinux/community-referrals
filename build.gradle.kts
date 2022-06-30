@@ -53,6 +53,12 @@ tasks.quarkusDev {
     }
 }
 
+/*tasks.quarkusBuild {
+    nativeArgs {
+        "additional-build-args" to "--allow-incomplete-classpath,--initialize-at-run-time=com.vaadin.flow.server.communication.PushRequestHandler"
+    }
+}*/
+
 allOpen {
     annotation("javax.ws.rs.Path")
     annotation("javax.enterprise.context.ApplicationScoped")
