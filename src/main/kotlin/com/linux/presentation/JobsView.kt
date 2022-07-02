@@ -33,9 +33,9 @@ class JobsView(@Inject @IdToken var idToken: JsonWebToken, @Inject var securityI
 
         if (!securityIdentity.isAnonymous) {
             val jobForm = JobForm().apply { width = "25em" }
-            add(createToolbar(), HorizontalLayout(
-                createGrid(jobForm), jobForm
-            ).apply {
+            val grid = createGrid(jobForm)
+
+            add(createToolbar(grid, jobForm), HorizontalLayout(grid, jobForm).apply {
                 addClassName("content")
                 setFlexGrow(2.0, getComponentAt(0))
                 setFlexGrow(1.0, getComponentAt(1))
@@ -70,11 +70,14 @@ class JobsView(@Inject @IdToken var idToken: JsonWebToken, @Inject var securityI
         jobForm.job = null
     }
 
-    private fun createToolbar() = HorizontalLayout(TextField().apply {
+    private fun createToolbar(grid: Grid<Job>, jobForm: JobForm) = HorizontalLayout(TextField().apply {
         placeholder = "Filter by Company"
         isClearButtonVisible = true
         valueChangeMode = ValueChangeMode.LAZY
-    }, Button("Add Job")).apply {
+    }, Button("Add Job") {
+        grid.asSingleSelect().clear()
+        onRowSelected(Job(), jobForm)
+    }).apply {
         addClassName("toolbar")
     }
 }
