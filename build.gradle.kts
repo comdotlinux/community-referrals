@@ -17,6 +17,7 @@ val vaadinVersion: String by project
 val vaadinQuarkusVersion: String by project
 
 dependencies {
+    implementation("io.quarkus:quarkus-hibernate-validator")
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 
     implementation(enforcedPlatform("com.vaadin:vaadin-bom:$vaadinVersion"))
@@ -26,12 +27,15 @@ dependencies {
     implementation("com.vaadin:vaadin-core-jandex")
     implementation("com.vaadin:vaadin-quarkus:$vaadinQuarkusVersion")
 
+    implementation("io.quarkus:quarkus-keycloak-authorization")
+    implementation("io.quarkus:quarkus-security")
+    implementation("io.quarkus:quarkus-oidc")
+
     implementation("io.quarkus:quarkus-websockets")
     implementation("io.quarkus:quarkus-container-image-docker")
     implementation("io.quarkus:quarkus-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-oidc")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
     testImplementation("io.quarkus:quarkus-junit5")

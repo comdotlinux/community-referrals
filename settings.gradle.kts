@@ -35,7 +35,7 @@ gradleEnterprise {
 
 buildCache {
     local {
-        isEnabled = true
+        isEnabled = false
         directory = File(rootDir, "build-cache")
         removeUnusedEntriesAfterDays = 30
         logger.info("Enabled Build Cache and Storing it in $rootDir/build-cache")

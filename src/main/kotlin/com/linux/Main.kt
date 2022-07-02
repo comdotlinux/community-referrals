@@ -1,11 +1,17 @@
-package com.example.starter.base
+package com.linux
 
-import com.linux.jobs.boundry.AppConfig
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.KeyDownEvent
 import com.vaadin.flow.component.PollEvent
+import com.vaadin.flow.component.dependency.NpmPackage
 import com.vaadin.flow.component.internal.JavaScriptBootstrapUI
+import com.vaadin.flow.component.page.AppShellConfigurator
+import com.vaadin.flow.server.PWA
+import com.vaadin.flow.theme.Theme
 import io.quarkus.runtime.annotations.RegisterForReflection
+import javax.websocket.Endpoint
+import javax.websocket.server.ServerApplicationConfig
+import javax.websocket.server.ServerEndpointConfig
 
 /**
  * Vaadin uses reflection behind the scenes, so we need to give some hints
@@ -33,3 +39,12 @@ import io.quarkus.runtime.annotations.RegisterForReflection
  */
 @RegisterForReflection(targets = [AppConfig::class, ClickEvent::class, PollEvent::class, KeyDownEvent::class, JavaScriptBootstrapUI::class])
 class ReflectionConfig
+
+
+@Theme
+@PWA(name = "Community Referrals", shortName = "referrals", description = "A Simple Community referral app to replace the spreadsheet and having to join a what's app group.", offlineResources = [])
+@NpmPackage(value = "line-awesome", version = "1.3.0")
+class AppConfig : AppShellConfigurator, ServerApplicationConfig {
+    override fun getEndpointConfigs(endpointClasses: MutableSet<Class<out Endpoint>>?) = mutableSetOf<ServerEndpointConfig>()
+    override fun getAnnotatedEndpointClasses(scanned: MutableSet<Class<*>>?) = mutableSetOf<Class<*>>()
+}
