@@ -67,6 +67,9 @@ allOpen {
     annotation("javax.ws.rs.Path")
     annotation("javax.enterprise.context.ApplicationScoped")
     annotation("io.quarkus.test.junit.QuarkusTest")
+    annotation("com.vaadin.flow.router.Route")
+    annotation("com.vaadin.flow.router.Route")
+    annotation("javax.persistence.Entity")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
