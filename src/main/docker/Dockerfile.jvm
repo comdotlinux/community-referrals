@@ -75,21 +75,23 @@
 #   accessed directly. (example: "foo.example.com,bar.example.com")
 #
 ###
-FROM registry.access.redhat.com/ubi8/openjdk-17:1.11
+FROM eclipse-temurin:17-jre-jammy
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
+RUN useradd -ms /bin/bash runner
+RUN mkdir --mode=755 --parents /home/runner/quarkus-app
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
-COPY --chown=185 build/quarkus-app/lib/ /deployments/lib/
-COPY --chown=185 build/quarkus-app/*.jar /deployments/
-COPY --chown=185 build/quarkus-app/app/ /deployments/app/
-COPY --chown=185 build/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --chown=runner:runner build/quarkus-app/lib/ /home/runner/quarkus-app/lib/
+COPY --chown=runner:runner build/quarkus-app/*.jar /home/runner/quarkus-app/
+COPY --chown=runner:runner build/quarkus-app/app/ /home/runner/quarkus-app/app/
+COPY --chown=runner:runner build/quarkus-app/quarkus/ /home/runner/quarkus-app/quarkus/
+COPY --chown=runner:runner run-app.sh /home/runner/quarkus-app/
+COPY --chown=runner:runner src/main/docker/.postgresql/root.crt /home/runner/quarkus-app/.postgresql/
 
-USER 185
-ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
-ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
-ENV QUARKUS_HTTP_PORT=${PORT:-8080}
-EXPOSE $QUARKUS_HTTP_PORT
-ENTRYPOINT [ "java" ]
-CMD ["-Dquarkus.http.host=0.0.0.0", "-Dquarkus.http.port=${QUARKUS_HTTP_PORT}", "-jar", "/usr/app/app.jar"]
+EXPOSE 8080
+USER runner
+WORKDIR /home/runner/quarkus-app
+ENV HOME=/home/martian
+ENTRYPOINT [ "/home/runner/quarkus-app/run-app.sh" ]

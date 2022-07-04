@@ -6,7 +6,6 @@ import com.linux.jobs.control.JobDataControl
 import com.linux.jobs.entity.Job
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
-import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -15,19 +14,17 @@ import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.VaadinServletRequest
-import com.vaadin.quarkus.annotation.VaadinSessionScoped
 import io.quarkus.narayana.jta.QuarkusTransaction
 import io.quarkus.oidc.IdToken
 import io.quarkus.security.identity.SecurityIdentity
 import org.eclipse.microprofile.jwt.JsonWebToken
 import org.jboss.logging.Logger
+import javax.annotation.PostConstruct
 import javax.inject.Inject
-import javax.transaction.Transactional
 
 @Suppress("unused")
 @Route(value = "")
 @PageTitle("Jobs")
-@VaadinSessionScoped
 class JobsView(
     @Inject @IdToken var idToken: JsonWebToken,
     @Inject var securityIdentity: SecurityIdentity,
@@ -35,11 +32,12 @@ class JobsView(
     @Inject var contactDataControl: ContactDataControl
 ) : VerticalLayout() {
     private val l = Logger.getLogger(JobsView::class.java)
-    lateinit var grid: Grid<Job>
-    lateinit var jobForm: JobForm
-    lateinit var companyNameFilter: TextField
+    private final val grid = createGrid()
+    private final val jobForm = JobForm()
+    private final val companyNameFilter = TextField()
 
-    init {
+    @PostConstruct
+    fun postConstruct() {
         l.infov("------idToken name : $idToken ------")
         l.infov("------ securityIdentity.roles : ${securityIdentity.roles} ------")
         l.info("------ VaadinServletRequest.getCurrent().userPrincipal : ${VaadinServletRequest.getCurrent().userPrincipal} ------")
@@ -48,9 +46,7 @@ class JobsView(
             QuarkusTransaction.run { contactDataControl.persist(Contact(email = idToken.name, givenName = idToken.getClaim("givenName"), familyName = idToken.getClaim("familyName"))) }
         }
 
-        jobForm = JobForm()
-        grid = createGrid()
-        companyNameFilter = TextField().apply {
+        companyNameFilter.apply {
             placeholder = "Filter by Company"
             isClearButtonVisible = true
             valueChangeMode = ValueChangeMode.LAZY

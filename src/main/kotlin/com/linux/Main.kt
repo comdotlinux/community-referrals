@@ -1,6 +1,10 @@
 package com.linux
 
+import com.linux.jobs.entity.Job
+import com.linux.presentation.JobForm
+import com.linux.presentation.JobsView
 import com.vaadin.flow.component.ClickEvent
+import com.vaadin.flow.component.ComponentEvent
 import com.vaadin.flow.component.KeyDownEvent
 import com.vaadin.flow.component.PollEvent
 import com.vaadin.flow.component.dependency.NpmPackage
@@ -37,7 +41,7 @@ import javax.websocket.server.ServerEndpointConfig
  * },
 </pre> *
  */
-@RegisterForReflection(targets = [AppConfig::class, ClickEvent::class, PollEvent::class, KeyDownEvent::class, JavaScriptBootstrapUI::class])
+@RegisterForReflection(targets = [AppConfig::class, ClickEvent::class, PollEvent::class, KeyDownEvent::class, JavaScriptBootstrapUI::class, ComponentEvent::class, Job::class, JobForm::class, JobsView::class])
 class ReflectionConfig
 
 

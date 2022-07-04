@@ -13,13 +13,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.shared.Registration
+import javax.annotation.PostConstruct
 
 
 @Suppress("unused")
 class JobForm : FormLayout() {
     var job: Job? = null
 
-    init {
+    @PostConstruct
+    fun init() {
         val binder = BeanValidationBinder(Job::class.java)
         addClassName("job-form")
         add(
