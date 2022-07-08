@@ -20,8 +20,7 @@ import javax.annotation.PostConstruct
 class JobForm : FormLayout() {
     var job: Job? = null
 
-    @PostConstruct
-    fun init() {
+    init {
         val binder = BeanValidationBinder(Job::class.java)
         addClassName("job-form")
         add(

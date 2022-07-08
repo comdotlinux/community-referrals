@@ -21,6 +21,7 @@ dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 
     implementation(enforcedPlatform("com.vaadin:vaadin-bom:$vaadinVersion"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     // Vaadin
     implementation("com.vaadin:vaadin-core")
@@ -53,7 +54,7 @@ java {
 tasks.quarkusDev {
     compilerOptions {
         compiler("kotlin")
-//            .args(mutableListOf("-Werror"))
+            .args(mutableListOf("-opt-in=kotlin.RequiresOptIn"))
     }
 }
 
@@ -68,7 +69,6 @@ allOpen {
     annotation("javax.enterprise.context.ApplicationScoped")
     annotation("io.quarkus.test.junit.QuarkusTest")
     annotation("com.vaadin.flow.router.Route")
-    annotation("com.vaadin.flow.router.Route")
     annotation("javax.persistence.Entity")
 }
 
@@ -77,9 +77,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.javaParameters = true
 }
 
-vaadin {
+/*vaadin {
     productionMode = true
-}
+}*/
 
 // TODO: De-duplicate following tasks with a single configurable task
 

@@ -1,10 +1,12 @@
 package com.linux.presentation
 
+import com.linux.auth.control.AuthenticationControl
 import com.linux.contact.control.ContactDataControl
-import com.linux.contact.entity.Contact
 import com.linux.jobs.control.JobDataControl
 import com.linux.jobs.entity.Job
+import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.details.Details
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -23,65 +25,43 @@ import javax.annotation.PostConstruct
 import javax.inject.Inject
 
 @Suppress("unused")
-@Route(value = "")
+//@Route("jobs")
+@Route(value = "", layout = MainView::class)
 @PageTitle("Jobs")
 class JobsView(
     @Inject @IdToken var idToken: JsonWebToken,
+    @Inject var authControl: AuthenticationControl,
     @Inject var securityIdentity: SecurityIdentity,
     @Inject var jobDataControl: JobDataControl,
     @Inject var contactDataControl: ContactDataControl
 ) : VerticalLayout() {
     private val l = Logger.getLogger(JobsView::class.java)
     private final val grid = createGrid()
-    private final val jobForm = JobForm()
-    private final val companyNameFilter = TextField()
+    private final val jobForm = createJobForm()
+
+    private final val companyNameFilter = createCompanyNameFilter()
+
 
     @PostConstruct
     fun postConstruct() {
-        l.infov("------idToken name : $idToken ------")
-        l.infov("------ securityIdentity.roles : ${securityIdentity.roles} ------")
-        l.info("------ VaadinServletRequest.getCurrent().userPrincipal : ${VaadinServletRequest.getCurrent().userPrincipal} ------")
-
-        if (contactDataControl.contactAbsent(idToken.name)) {
-            QuarkusTransaction.run { contactDataControl.persist(Contact(email = idToken.name, givenName = idToken.getClaim("givenName"), familyName = idToken.getClaim("familyName"))) }
-        }
-
-        companyNameFilter.apply {
-            placeholder = "Filter by Company"
-            isClearButtonVisible = true
-            valueChangeMode = ValueChangeMode.LAZY
-        }
-//
-//        if (securityIdentity.isAnonymous) {
-//
-//        }
-
-
-        with(jobForm) {
-            width = "25em"
-
-            addListener(SaveEvent::class.java) {
-                jobDataControl.persist(it.job!!)
-                updateList()
-                closeEditor()
-            }
-            addListener(DeleteEvent::class.java) { println(it) }
-            addListener(CloseEvent::class.java) { closeEditor() }
-        }
-
-        grid.asSingleSelect().addValueChangeListener { event -> onRowSelected(event.value, jobForm) }
-
-        add(HorizontalLayout(companyNameFilter, Button("Add Job") {
-            grid.asSingleSelect().clear()
-            onRowSelected(Job(), jobForm)
-        }, Span(idToken.name).apply { element.themeList.add("badge success")} ).apply { addClassName("toolbar") }, HorizontalLayout(grid, jobForm).apply {
-            addClassName("content")
-            setFlexGrow(2.0, getComponentAt(0))
-            setFlexGrow(1.0, getComponentAt(1))
-            setSizeFull()
-        })
-        addClassName("jobs-list")
         setSizeFull()
+        add(HorizontalLayout(companyNameFilter, Button("Add Job") { grid.asSingleSelect().clear(); onRowSelected(Job(), jobForm) }).apply { addClassName("toolbar") },
+            HorizontalLayout(grid, jobForm).apply {
+                addClassName("content")
+                setFlexGrow(2.0, grid)
+                setFlexGrow(1.0, jobForm)
+                setSizeFull()
+            })
+        addClassName("jobs-list")
+        grid.asSingleSelect().addValueChangeListener { event -> onRowSelected(event.value, jobForm) }
+    }
+
+    private fun userInfo(): Component {
+        val contact = contactDataControl.findByEmail(authControl.email())!!
+        return Details(contact.name(), VerticalLayout(Span(contact.email)).apply { isSpacing = false; isPadding = false }).apply {
+            isOpened = false
+        }
+
     }
 
     private fun checkOrCreateContact() {
@@ -101,6 +81,19 @@ class JobsView(
         grid.setItems(jobDataControl.list("company", companyNameFilter.value))
     }
 
+
+    private fun createJobForm() = JobForm().apply {
+        width = "25em"
+
+        addListener(SaveEvent::class.java) {
+            jobDataControl.persist(it.job!!)
+            updateList()
+            closeEditor()
+        }
+        addListener(DeleteEvent::class.java) { println(it) }
+        addListener(CloseEvent::class.java) { closeEditor() }
+    }
+
     private fun createGrid() = Grid<Job>().apply {
         addClassName("job-grid")
         setSizeFull()
@@ -113,16 +106,23 @@ class JobsView(
         columns.forEach { it.setAutoWidth(true) }
     }
 
+    private fun createCompanyNameFilter() = TextField().apply {
+        placeholder = "Filter by Company"
+        isClearButtonVisible = true
+        valueChangeMode = ValueChangeMode.LAZY
+    }
+
     private fun onRowSelected(valueFromEvent: Job?, jobForm: JobForm) {
+        l.warn("value from event is null ${valueFromEvent == null}")
         if (valueFromEvent != null) {
             jobForm.addClassName("editing")
             jobForm.isVisible = true
             jobForm.job = valueFromEvent
-            return
+        } else {
+            jobForm.removeClassName("editing")
+            jobForm.isVisible = false
+            jobForm.job = null
         }
 
-        jobForm.removeClassName("editing")
-        jobForm.isVisible = false
-        jobForm.job = null
     }
 }
