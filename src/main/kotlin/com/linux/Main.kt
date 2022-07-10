@@ -44,7 +44,7 @@ import javax.websocket.server.ServerEndpointConfig
 @Theme(themeClass = Lumo::class, variant = Lumo.DARK)
 @PWA(name = "Community Referrals", shortName = "referrals", description = "A Simple Community referral app to replace the spreadsheet and having to join a what's app group.", offlineResources = [])
 @NpmPackage(value = "line-awesome", version = "1.3.0")
-@RegisterForReflection(targets = [AppConfig::class, ClickEvent::class, PollEvent::class, KeyDownEvent::class, JavaScriptBootstrapUI::class, ComponentEvent::class, Job::class, JobForm::class, JobsView::class, MainView::class, JobFormEvent::class, CloseEvent::class, DeleteEvent::class, SaveEvent::class])
+@RegisterForReflection(targets = [AppConfig::class, ClickEvent::class, PollEvent::class, KeyDownEvent::class, JavaScriptBootstrapUI::class, ComponentEvent::class, Job::class, JobForm::class, JobsView::class, MainView::class])
 class AppConfig : AppShellConfigurator, ServerApplicationConfig {
     override fun getEndpointConfigs(endpointClasses: MutableSet<Class<out Endpoint>>?) = mutableSetOf<ServerEndpointConfig>()
     override fun getAnnotatedEndpointClasses(scanned: MutableSet<Class<*>>?) = mutableSetOf<Class<*>>()

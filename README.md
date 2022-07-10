@@ -31,7 +31,7 @@ If you want to build an _über-jar_, execute the following command:
 
 The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
 
-## Creating a native executable
+## (Not Working With Vaadin) Creating a native executable
 
 You can create a native executable using:
 ```shell script
@@ -52,16 +52,7 @@ If you want to learn more about building native executables, please consult http
 - Kotlin ([guide](https://quarkus.io/guides/kotlin)): Write your services in Kotlin
 - Redis Client ([guide](https://quarkus.io/guides/redis)): Connect to Redis in either imperative or reactive style
 
-## Provided Code
-
-### RESTEasy Reactive
-
-Easily start your Reactive RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-### RESTEasy Reactive Qute
-
-Create your web page using Quarkus RESTEasy Reactive & Qute
-
-[Related guide section...](https://quarkus.io/guides/qute#type-safe-templates)
+### Kill running processes
+```shell
+sudo netstat -anop | grep -v unix | grep 8080 | awk '{print $7}' | awk -F\/ '{print $1}' | uniq | xargs kill
+```

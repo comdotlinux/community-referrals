@@ -32,7 +32,7 @@ import kotlin.streams.asSequence
 //@CssImport("./styles/views/main/main-view.css")
 //@JsModule("./styles/shared-styles.js")
 @Route(value = "main")
-class MainView(@Inject var authControl: AuthenticationControl, @Inject var contactDataControl: ContactDataControl, @Inject var jobsView: JobsView) : AppLayout() {
+class MainView(@Inject var authControl: AuthenticationControl, @Inject var contactDataControl: ContactDataControl) : AppLayout() {
 
     val menu: Tabs = createMenu()
     val viewTitle: H1 = H1()
@@ -41,7 +41,7 @@ class MainView(@Inject var authControl: AuthenticationControl, @Inject var conta
     fun init() {
         QuarkusTransaction.run {
             if (contactDataControl.contactAbsent(authControl.email())) {
-                contactDataControl.persist(Contact(email = authControl.email(), givenName = authControl.givenName(), familyName = authControl.familyName()))
+                contactDataControl.persistAndFlush(Contact(email = authControl.email(), givenName = authControl.givenName(), familyName = authControl.familyName()))
             }
         }
         primarySection = Section.DRAWER

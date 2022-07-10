@@ -17,18 +17,23 @@ class Contact(
     var givenName: String? = null,
     var familyName: String? = null,
     @Enumerated(STRING) var interest: Interest = Interest.NONE,
-    @OneToMany(mappedBy = "contact") var jobs: MutableSet<Job> = mutableSetOf(),
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "contact") var jobs: MutableSet<Job> = mutableSetOf(),
     @Column(name = "created_at") @CreationTimestamp() var createdAt: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified_at") @UpdateTimestamp var modifiedAt: LocalDateTime = LocalDateTime.now()
 ) {
     @Transient
     fun name() = "$givenName $familyName"
+    @Transient
+    override fun toString(): String {
+        return "Contact(id=$id, email='$email', givenName=$givenName, familyName=$familyName, interest=$interest, createdAt=$createdAt, modifiedAt=$modifiedAt)"
+    }
 }
 
-@Converter(autoApply = true)
-enum class Interest : AttributeConverter<Interest, String> {
+enum class Interest {
     MENTOR, MENTEE, NONE;
-
+}
+@Converter(autoApply = true)
+class InterestConverter: AttributeConverter<Interest, String> {
     override fun convertToDatabaseColumn(interest: Interest) = interest.name
-    override fun convertToEntityAttribute(interest: String) = valueOf(interest)
+    override fun convertToEntityAttribute(interest: String) = Interest.valueOf(interest)
 }

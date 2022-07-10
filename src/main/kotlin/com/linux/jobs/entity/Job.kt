@@ -15,21 +15,30 @@ class Job(
     @Id @GeneratedValue var id: Long? = null,
     @Column(name = "company") @NotBlank var company: String = "",
     @Column(name = "current_openings") @NotBlank var currentJobOpenings: String = "",
-    @ElementCollection
-    @CollectionTable @NotEmpty var domains: MutableSet<JobDomain> = mutableSetOf(),
+    @ElementCollection(fetch = FetchType.EAGER) @CollectionTable @NotEmpty var domains: MutableSet<JobDomain> = mutableSetOf(),
     @NotNull @Enumerated(STRING) var slots: Slot = Slot.NONE,
-    @ManyToOne @JoinColumn(name="contact_id", nullable=false) var contact: Contact = Contact(),
+    @ManyToOne(fetch = FetchType.EAGER) @JoinColumn(name="contact_id", nullable=false) var contact: Contact = Contact(),
     @Column(name = "created_at") @CreationTimestamp() var createdAt: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified_at") @UpdateTimestamp var modifiedAt: LocalDateTime = LocalDateTime.now()
-)
+) {
+    @Transient
+    override fun toString(): String {
+        return "Job(id=$id, company='$company', currentJobOpenings='$currentJobOpenings', domains=$domains, slots=$slots, createdAt=$createdAt, modifiedAt=$modifiedAt)"
+    }
+}
 
 @Embeddable
-@Table(name = "job_domain")
+@Table(name = "job_domains")
 class JobDomain(
     @NotBlank var domain: String = "",
     @Column(name = "created_at") @CreationTimestamp() var createdAt: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified_at") @UpdateTimestamp var modifiedAt: LocalDateTime = LocalDateTime.now()
-)
+) {
+    @Transient
+    override fun toString(): String {
+        return "JobDomain(domain='$domain', createdAt=$createdAt, modifiedAt=$modifiedAt)"
+    }
+}
 
 @Converter(autoApply = true)
 enum class Slot(val value: String) : AttributeConverter<Slot, String> {
