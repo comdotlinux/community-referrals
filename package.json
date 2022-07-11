@@ -121,17 +121,27 @@
     "lit": "2.2.3"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "3.1.0",
     "async": "3.2.2",
+    "chokidar": "^3.5.0",
+    "compression-webpack-plugin": "4.0.1",
+    "css-loader": "5.2.7",
+    "esbuild-loader": "2.19.0",
+    "extra-watch-webpack-plugin": "1.0.3",
+    "extract-loader": "5.1.0",
+    "file-loader": "6.2.0",
+    "fork-ts-checker-webpack-plugin": "6.2.1",
     "glob": "7.1.6",
-    "mkdirp": "1.0.4",
-    "rollup-plugin-brotli": "3.1.0",
+    "html-webpack-plugin": "4.5.1",
+    "lit-css-loader": "0.1.0",
+    "loader-utils": "2.0.0",
     "typescript": "4.5.3",
-    "vite": "v2.9.1",
-    "vite-plugin-checker": "0.3.4",
-    "workbox-build": "6.5.0",
+    "webpack": "4.46.0",
+    "webpack-cli": "4.10.0",
+    "webpack-dev-server": "4.9.2",
+    "webpack-merge": "4.2.2",
     "workbox-core": "6.5.0",
-    "workbox-precaching": "6.5.0"
+    "workbox-precaching": "6.5.0",
+    "workbox-webpack-plugin": "6.5.0"
   },
   "vaadin": {
     "dependencies": {
@@ -253,19 +263,29 @@
       "lit": "2.2.3"
     },
     "devDependencies": {
-      "@rollup/plugin-replace": "3.1.0",
       "async": "3.2.2",
+      "chokidar": "^3.5.0",
+      "compression-webpack-plugin": "4.0.1",
+      "css-loader": "5.2.7",
+      "esbuild-loader": "2.19.0",
+      "extra-watch-webpack-plugin": "1.0.3",
+      "extract-loader": "5.1.0",
+      "file-loader": "6.2.0",
+      "fork-ts-checker-webpack-plugin": "6.2.1",
       "glob": "7.1.6",
-      "mkdirp": "1.0.4",
-      "rollup-plugin-brotli": "3.1.0",
+      "html-webpack-plugin": "4.5.1",
+      "lit-css-loader": "0.1.0",
+      "loader-utils": "2.0.0",
       "typescript": "4.5.3",
-      "vite": "v2.9.1",
-      "vite-plugin-checker": "0.3.4",
-      "workbox-build": "6.5.0",
+      "webpack": "4.46.0",
+      "webpack-cli": "4.10.0",
+      "webpack-dev-server": "4.9.2",
+      "webpack-merge": "4.2.2",
       "workbox-core": "6.5.0",
-      "workbox-precaching": "6.5.0"
+      "workbox-precaching": "6.5.0",
+      "workbox-webpack-plugin": "6.5.0"
     },
-    "hash": "3ca73c461d690374bbe1d37c94db8fcedc635da578fcd4a063f75e04ef007add"
+    "hash": "d8c1747ab78ed970e29f3344a481a4fffda2910a348c4c21e04f0ae29bfc347d"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -383,6 +403,7 @@
     "@polymer/polymer": "$@polymer/polymer",
     "date-fns": "$date-fns",
     "@vaadin/lit-renderer": "$@vaadin/lit-renderer",
-    "line-awesome": "$line-awesome"
+    "line-awesome": "$line-awesome",
+    "chokidar": "$chokidar"
   }
 }

@@ -8,5 +8,4 @@ import javax.validation.constraints.NotBlank;
 public class JobDomain {
     @NotBlank
     public String domain;
-
 }

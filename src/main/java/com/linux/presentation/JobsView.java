@@ -15,7 +15,6 @@ import io.quarkus.narayana.jta.QuarkusTransaction;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.*;
 
@@ -53,7 +52,7 @@ public class JobsView extends VerticalLayout {
         grid.addColumn((job) -> job.company).setHeader("Company").setSortable(true).setFrozen(true);
         grid.addColumn((job) -> job.currentJobOpenings).setHeader("Information About The Opening").setSortable(true).setFrozen(true);
         grid.addColumn((job) -> job.domains.stream().map((jobDomain) -> jobDomain.domain).collect(Collectors.joining(","))).setHeader("Job Domains").setSortable(true).setFrozen(true);
-        grid.addColumn((job) -> job.slots.value).setHeader("Number Of Openings").setSortable(true).setFrozen(true);
+        grid.addColumn((job) -> job.slots.dbData).setHeader("Number Of Openings").setSortable(true).setFrozen(true);
         grid.addColumn((job) -> job.contact.name()).setHeader("Contact Information").setSortable(true).setFrozen(true);
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
         grid.asSingleSelect().addValueChangeListener(event -> editJob(event.getValue()));

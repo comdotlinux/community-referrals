@@ -12,7 +12,6 @@ import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.shared.Registration;
 import org.jboss.logging.Logger;
 
-import javax.persistence.Transient;
 import java.util.*;
 import java.util.stream.*;
 
@@ -22,7 +21,7 @@ public class JobForm extends FormLayout {
     TextField company = new TextField("Company");
     TextField currentJobOpenings = new TextField("Information About The Opening");
     TextField domains = new TextField("Job Domains");
-    TextField slots = new TextField("Number Of Openings");
+    ComboBox<Slot> slots = new ComboBox<>("Number Of Openings");
 
     Button save = new Button("Save");
     Button delete = new Button("Delete");
@@ -33,11 +32,15 @@ public class JobForm extends FormLayout {
 
     public JobForm() {
         addClassName("contact-form");
+        binder.forField(company).bind(j -> j.company, (j, company) -> j.company = company);
+        binder.forField(currentJobOpenings).bind(j -> j.currentJobOpenings, (j, currentJobOpenings) -> j.currentJobOpenings = currentJobOpenings);
+        binder.forField(domains).withConverter(new JobDomainConverter()).bind(j -> j.domains, (j, domains) -> j.domains = domains);
+
+        slots.setItems(Arrays.stream(Slot.values()).sorted().collect(Collectors.toList()));
+        slots.setItemLabelGenerator(Slot::asString);
+        binder.forField(slots).withConverter(new SlotConverter()).bind(j -> Slot.asString(j.slots), (j, value) -> j.slots = Slot.fromString(value));
+
         add(company, currentJobOpenings, domains, slots, createButtonsLayout());
-        binder.forField(company).bind((j) -> j.company, (j, company) -> j.company = company);
-        binder.forField(currentJobOpenings).bind((j) -> j.currentJobOpenings, (j, currentJobOpenings) -> j.currentJobOpenings = currentJobOpenings);
-        binder.forField(domains).withConverter(new JobDomainConverter()).bind((j) -> j.domains, (j, domains) -> j.domains = domains );
-        binder.forField(slots).withConverter(new SlotConverter()).bind((j) -> j.slots, (j, slot) -> j.slots = slot);
     }
 
     public void setJob(Job job) {
@@ -104,40 +107,31 @@ public class JobForm extends FormLayout {
     }
 
 
-    class JobDomainConverter implements Converter<String, Set<JobDomain>> {
+    static class JobDomainConverter implements Converter<String, Set<JobDomain>> {
         @Override
         public Result<Set<JobDomain>> convertToModel(String value, ValueContext context) {
-            if(value == null || "".equals(value)) {
+            if (value == null || "".equals(value)) {
                 return Result.ok(Set.of());
             }
 
-            return Result.ok(Arrays.stream(value.split(",")).map((jobDomainValue) -> {
-                var jobDomain = new JobDomain();
-                jobDomain.domain = jobDomainValue;
-                return jobDomain;
-            }).collect(Collectors.toSet()));
+            return Result.ok(Arrays.stream(value.split(",")).map((jobDomainValue) -> JobDomainBuilder.create().withDomain(jobDomainValue.strip()).build()).collect(Collectors.toSet()));
         }
 
         @Override
         public String convertToPresentation(Set<JobDomain> value, ValueContext context) {
-            return value == null ? "" : value.stream().map((jobDomain) -> jobDomain.domain).collect(Collectors.joining(","));
+            return value == null ? "" : value.stream().map((jobDomain) -> jobDomain.domain.strip()).collect(Collectors.joining(", "));
         }
     }
 
-    class SlotConverter implements Converter<String, Slot> {
-
+    static class SlotConverter implements Converter<Slot, String> {
         @Override
-        public Result<Slot> convertToModel(String value, ValueContext context) {
-            try {
-                return Result.ok(Slot.valueOf(value));
-            } catch (IllegalArgumentException iae) {
-                return Result.error("Not a Valid Slot Value");
-            }
+        public Result<String> convertToModel(Slot slot, ValueContext context) {
+            return Result.ok(Slot.asString(slot));
         }
 
         @Override
-        public String convertToPresentation(Slot slot, ValueContext context) {
-            return slot == null ? "" : slot.value;
+        public Slot convertToPresentation(String value, ValueContext context) {
+            return Slot.fromString(value);
         }
     }
 }
