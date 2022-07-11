@@ -11,17 +11,17 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v1
 
-    - name: 'asdf: Setup'
-      uses: asdf-vm/actions/setup@v1.1.0
-      with:
-        asdf_branch: v0.9.0
-
-    - name: 'asdf: plugin install / update'
-      shell: bash
-      run: asdf plugin update --all
-
-    - name: 'asdf: install'
-      uses: asdf-vm/actions/install@v1
+#     - name: 'asdf: Setup'
+#       uses: asdf-vm/actions/setup@v1.1.0
+#       with:
+#         asdf_branch: v0.9.0
+#
+#     - name: 'asdf: plugin install / update'
+#       shell: bash
+#       run: asdf plugin update --all
+#
+#     - name: 'asdf: install'
+#       uses: asdf-vm/actions/install@v1
 
     - name: 'gradle: cache'
       uses: actions/cache@v3
@@ -32,11 +32,14 @@ jobs:
           ${{ github.workspace }}/build-cache
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: ${{ runner.os }}-gradle-
+      env:
+        JAVA_HOME: ${JAVA_HOME_17_X64}
 
     - name: 'gradle: Build (skipping tests for now) push and release to heroku'
       run: ./gradlew herokuDeploy -x test
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        JAVA_HOME: ${JAVA_HOME_17_X64}
 
     - name: Deployment Logs
       run: heroku logs --app nokri-nokri --num 500
