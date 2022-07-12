@@ -1,3 +1,5 @@
+import io.quarkus.runtime.configuration.ProfileManager.getActiveProfile
+
 plugins {
     java
     id("io.quarkus")
@@ -55,9 +57,9 @@ tasks.withType<JavaCompile> {
 //    options.compilerArgs.add("-parameters")
 }
 
-/*vaadin {
-    productionMode = true
-}*/
+vaadin {
+    productionMode = "dev" != getActiveProfile()
+}
 
 // TODO: De-duplicate following tasks with a single configurable task
 
