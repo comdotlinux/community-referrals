@@ -33,13 +33,13 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: ${{ runner.os }}-gradle-
       env:
-        JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+        JAVA_HOME: ${JAVA_HOME_17_X64}
 
     - name: 'gradle: Build (skipping tests for now) push and release to heroku'
-      run: ./gradlew herokuDeploy -x test -Dorg.gradle.java.home=${JAVA_HOME}
+      run: ./gradlew herokuDeploy -x test -Dorg.gradle.java.home=${JAVA_HOME_17_X64}
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+        JAVA_HOME: ${JAVA_HOME_17_X64}
 
     - name: Deployment Logs
       run: heroku logs --app nokri-nokri --num 500
