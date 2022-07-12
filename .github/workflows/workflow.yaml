@@ -24,6 +24,6 @@ jobs:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
     - name: Deployment Logs
-      run: heroku logs --app nokri-nokri --num 500
+      run: bash -c "sleep 10 && heroku logs --app community-referrals --num 500"
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
