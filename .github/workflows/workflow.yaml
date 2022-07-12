@@ -36,7 +36,7 @@ jobs:
         JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
 
     - name: 'gradle: Build (skipping tests for now) push and release to heroku'
-      run: ./gradlew herokuDeploy -x test
+      run: ./gradlew herokuDeploy -x test -Dorg.gradle.java.home=${JAVA_HOME}
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
