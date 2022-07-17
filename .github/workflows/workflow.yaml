@@ -19,7 +19,7 @@ jobs:
         cache: 'gradle'
 
     - name: 'gradle: Build (skipping tests for now) push and release to heroku'
-      run: ./gradlew --info clean herokuDeploy -x test -Dquarkus.profile=prod
+      run: ./gradlew herokuDeploy -x test -Dquarkus.profile=prod
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
