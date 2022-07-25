@@ -1,12 +1,124 @@
+# Keycloak with Let's Encrypt in a Docker Swarm
+
+# Create a secret for storing the password for Keycloak database using the command:
+# printf "YourPassword" | docker secret create keycloak-postgres-password -
+
+# Create a secret for storing the password for Keycloak administrator using the command:
+# printf "YourPassword" | docker secret create keycloak-application-password -
+
+# Clear passwords from bash history using the command:
+# history -c && history -w
+
+# Deploy Keycloak in a Docker Swarm using the command:
+# docker stack deploy -c keycloak-letsencrypt-docker-swarm.yml keycloak
+
 version: '3.8'
+
+x-default-opts:
+  &default-opts
+  logging:
+    options:
+      max-size: "10m"
+
+networks:
+  community-referrals-network:
+    driver: overlay
+  traefik-public:
+    external: true
+
+secrets:
+  quarkus-datasource-jdbc-url:
+    external: true
+  keycloak-application-password:
+    external: true
+
 services:
   postgres:
+    <<: *default-opts
+    # Image tag (replace with yours)
     image: postgres:14
+    volumes:
+      - keycloak-postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: postgrespassword
+      # Database name (replace with yours)
+      POSTGRES_DB: keycloakdb
+      # Database user (replace with yours)
+      POSTGRES_USER: keycloakdbuser
+      POSTGRES_PASSWORD_FILE: /run/secrets/keycloak-postgres-password
     networks:
-      - dbn
-networks:
-  dbn:
-    external:
-      name: "host"
+      - keycloak-network
+    ports:
+      - "5432:5432"
+    secrets:
+      - keycloak-postgres-password
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        delay: 15s
+        parallelism: 1
+        monitor: 10s
+        failure_action: rollback
+        max_failure_ratio: 0.55
+      # Container resources (replace with yours)
+      resources:
+        limits:
+          cpus: '1'
+          memory: 8G
+        reservations:
+          cpus: '0.5'
+          memory: 6G
+
+  keycloak:
+    <<: *default-opts
+    # Image tag (replace with yours)
+    #image: quay.io/keycloak/keycloak:latest
+    image: keycloak-custom:latest
+    environment:
+      KC_DB: postgres
+      #DB_ADDR: postgres
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_HOST: postgres
+      # Database name (replace with yours)
+      KC_DB_URL_DATABASE: keycloakdb
+      # Database user (replace with yours)
+      KC_DB_USERNAME: keycloakdbuser
+      KC_DB_PASSWORD_FILE: /run/secrets/keycloak-postgres-password
+      # Keycloak user (replace with yours)
+      KEYCLOAK_ADMIN: keycloakadmin
+      KC_ADMIN_PASSWORD_FILE: /run/secrets/keycloak-application-password # this is converted to KEYCLOAK_ADMIN_PASSWORD_FILE in the kc-entrypoint.sh
+      # KC_LOG_LEVEL: debug
+      JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
+      JGROUPS_DISCOVERY_PROPERTIES: datasource_jndi_name=java:jboss/datasources/KeycloakDS,info_writer_sleep_time=500,initialize_sql="CREATE TABLE IF NOT EXISTS JGROUPSPING ( own_addr varchar(200) NOT NULL, cluster_name varchar(200) NOT NULL, created timestamp default current_timestamp, ping_data BYTEA, constraint PK_JGROUPSPING PRIMARY KEY (own_addr, cluster_name))"
+      PROXY_ADDRESS_FORWARDING: 'true'
+      KC_PROXY: 'edge'
+      KEYCLOAK_LOGLEVEL: INFO
+      KC_HOSTNAME: auth.kulkarni.cloud
+    networks:
+      - keycloak-network
+      - traefik-network
+    secrets:
+      - keycloak-postgres-password
+      - keycloak-application-password
+    deploy:
+      mode: replicated
+      replicas: 1
+      # Container resources (replace with yours)
+      resources:
+        limits:
+          cpus: '1'
+          memory: 8G
+        reservations:
+          cpus: '0.5'
+          memory: 4G
+      labels:
+        - "traefik.enable=true"
+        # Keycloak URL (replace with yours)
+        - "traefik.http.routers.keycloak.rule=Host(`auth.kulkarni.cloud`)"
+        - "traefik.http.routers.keycloak.service=keycloak"
+        - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.keycloak.entrypoints=websecure"
+        - "traefik.http.services.keycloak.loadbalancer.passhostheader=true"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    depends_on:
+      - postgres
