@@ -88,10 +88,10 @@ COPY --chown=runner:runner build/quarkus-app/*.jar /home/runner/quarkus-app/
 COPY --chown=runner:runner build/quarkus-app/app/ /home/runner/quarkus-app/app/
 COPY --chown=runner:runner build/quarkus-app/quarkus/ /home/runner/quarkus-app/quarkus/
 COPY --chown=runner:runner run-app.sh /home/runner/quarkus-app/
-COPY --chown=runner:runner src/main/docker/.postgresql/root.crt /home/runner/quarkus-app/.postgresql/
+COPY --chown=runner:runner src/main/docker/.postgresql/root.crt /home/runner/.postgresql/
 
 EXPOSE 8080
 USER runner
 WORKDIR /home/runner/quarkus-app
-ENV HOME=/home/martian
+ENV HOME=/home/runner
 ENTRYPOINT [ "/home/runner/quarkus-app/run-app.sh" ]

@@ -33,9 +33,9 @@ public class DockerSwarmSecretsConfigSource implements ConfigSource {
                 .filter(fileName -> !fileName.isEmpty())
                 .collect(Collectors.toSet());
         } catch (IOException e) {
-            l.warn("Error in reading secret files", e);
+            l.debug("Error in reading secret files", e);
         }
-
+        l.info("returning empty set");
         return Set.of();
     }
 
@@ -44,8 +44,9 @@ public class DockerSwarmSecretsConfigSource implements ConfigSource {
         try {
             return Files.readString(Paths.get("/run/secrets", propertyName), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            l.warnv(e,"Error in reading secret {0}", propertyName);
+            l.debugv(e,"Error in reading secret {0}", propertyName);
         }
+        l.info("returning null");
         return null;
     }
 

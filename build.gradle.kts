@@ -61,6 +61,7 @@ vaadin {
     productionMode = "dev" != getActiveProfile()
 }
 
+
 // TODO: De-duplicate following tasks with a single configurable task
 
 task("herokuLogin") {
