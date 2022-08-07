@@ -66,11 +66,11 @@ vaadin {
 
 task("herokuLogin") {
     group = "referrals"
-    description="Login to heroku"
+    description = "Login to heroku"
     doLast {
         exec {
-            executable="heroku"
-            args="container:login".split(" ")
+            executable = "heroku"
+            args = "container:login".split(" ")
             environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
         }
     }
@@ -78,12 +78,12 @@ task("herokuLogin") {
 
 task("herokuPushImage") {
     group = "referrals"
-    description="Push Created docker Image to Heroku"
+    description = "Push Created docker Image to Heroku"
     dependsOn("herokuLogin", tasks.findByName("build"))
     doLast {
         exec {
-            executable="docker"
-            args="push registry.heroku.com/community-referrals/web".split(" ")
+            executable = "docker"
+            args = "push registry.heroku.com/community-referrals/web".split(" ")
             environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
         }
     }
@@ -91,12 +91,12 @@ task("herokuPushImage") {
 
 task("herokuDeploy") {
     group = "referrals"
-    description="Trigger Deployment to heroku"
+    description = "Trigger Deployment to heroku"
     dependsOn("herokuPushImage")
     doLast {
         exec {
-            executable="heroku"
-            args="container:release web --app community-referrals".split(" ")
+            executable = "heroku"
+            args = "container:release web --app community-referrals".split(" ")
             environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
         }
     }
@@ -104,12 +104,24 @@ task("herokuDeploy") {
 
 task("herokuShowLogs") {
     group = "referrals"
-    description="Show logs from heroku container"
+    description = "Show logs from heroku container"
     doLast {
         exec {
-            executable="heroku"
-            args="logs --app community-referrals --num 500 --force-colors".split(" ")
+            executable = "heroku"
+            args = "logs --app community-referrals --num 500 --force-colors".split(" ")
             environment("HEROKU_API_KEY", System.getenv("HEROKU_API_KEY"))
+        }
+    }
+}
+
+
+tasks.register("localPostgres") {
+    group = "referrals"
+    description = "Start local postgres docker"
+    doLast {
+        exec {
+            executable = "docker"
+            args = "run --rm -d -p 5432:5432 --shm-size=256MB --name postgres -e POSTGRES_PASSWORD=postgres postgres:14".split(" ")
         }
     }
 }

@@ -14,6 +14,7 @@ public class ContactDataControl implements PanacheRepository<Contact> {
         if (!contactPresent(email)) {
             var contact = new Contact();
             contact.email = email;
+            persist(contact);
             return contact;
         }
         return findByEmail(email);

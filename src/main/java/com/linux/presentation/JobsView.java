@@ -40,6 +40,7 @@ public class JobsView extends VerticalLayout {
         this.authenticationControl = authenticationControl;
         addClassName("jobs-list");
         setSizeFull();
+        updateList();
         configureGrid();
         configureForm();
         add(getToolbar(), getContent());
@@ -63,6 +64,7 @@ public class JobsView extends VerticalLayout {
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
+        filterText.setValue("");
 
         Button addJobButton = new Button("Add Job");
         addJobButton.addClickListener(click -> addJob());
@@ -73,6 +75,7 @@ public class JobsView extends VerticalLayout {
     }
 
     private void updateList() {
+        filterText.getValue();
         grid.setItems(jobDataControl.findByCompany(filterText.getValue()));
     }
 
@@ -119,11 +122,14 @@ public class JobsView extends VerticalLayout {
     private void saveJob(SaveEvent event) {
         QuarkusTransaction.run(() -> {
             var job = event.job;
+            if(!jobDataControl.isPersistent(job)) {
+                l.warn("job from event is not persistent!" );
+            }
             job.contact = contactDataControl.findOrCreate(authenticationControl.email());
             jobDataControl.persist(job);
+            updateList();
+            closeEditor();
         });
-        updateList();
-        closeEditor();
     }
 
     private void deleteJob(DeleteEvent event) {
